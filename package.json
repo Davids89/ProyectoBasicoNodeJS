@@ -1,0 +1,22 @@
+{
+	"name" : "ServidorNodeJS",
+	"main" : "server.js",
+	"dependencies" : {
+		"express": "~4.11.2",
+		"ejs" : "*",
+		"mongoose": "~3.8.23",
+		"passport": "~0.2.1",
+		"passport-local": "~1.0.0",
+		"passport-facebook": "~1.0.3",
+		"passport-twitter" : "~1.0.2",
+		"passport-google-oauth" : "~0.1.5",
+		"connect-flash" : "~0.1.1",
+		"bcrypt-nodejs" : "latest",
+
+		"morgan": "~1.5.1",
+		"body-parser": "~1.12.0",
+		"cookie-parser": "~1.3.4",
+		"method-override": "~2.3.1",
+		"express-session": "~1.10.3"
+	}
+}
