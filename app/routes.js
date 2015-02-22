@@ -16,7 +16,11 @@ module.exports = function(app, passport){
 	});
 
 	//procesamos el formulario de login
-	//app.post('/login', cosas);
+	app.post('/login', passport.authenticate('local-login', {
+		successRedirect : '/profile',
+		failureRedirect : '/login',
+		failureFlash : true
+	}));
 
 	app.get('/signup', function(req, res){
 
@@ -30,7 +34,7 @@ module.exports = function(app, passport){
 		successRedirect : '/profile',
 		failureRedirect : '/signup',
 		failureFlash : true
-	}))
+	}));
 
 	//PANEL DE USUARIO
 	//queremos proteger esta pagina asi que nos aseguraremos de que este logueado
