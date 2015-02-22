@@ -26,7 +26,11 @@ module.exports = function(app, passport){
 	});
 
 	//procesamos el formulario de registro
-	//app.post('/signup', cosas);
+	app.post('/signup', passport.authenticate('local-signup', {
+		succesRedirect : '/profile', //redireccionamos al perfil de usuario
+		failureRedirect : '/signup', 
+		failureFlash : true //asignamos mensajes flash al fallo de registro
+	}));
 
 	//PANEL DE USUARIO
 	//queremos proteger esta pagina asi que nos aseguraremos de que este logueado
