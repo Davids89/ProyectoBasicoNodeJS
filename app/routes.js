@@ -26,11 +26,11 @@ module.exports = function(app, passport){
 	});
 
 	//procesamos el formulario de registro
-	app.post('/signup', passport.authenticate('local-signup', {
-		succesRedirect : '/profile', //redireccionamos al perfil de usuario
-		failureRedirect : '/signup', 
-		failureFlash : true //asignamos mensajes flash al fallo de registro
-	}));
+	app.post('/signup', passport.authenticate('local-signup',{
+		successRedirect : '/profile',
+		failureRedirect : '/signup',
+		failureFlash : true
+	}))
 
 	//PANEL DE USUARIO
 	//queremos proteger esta pagina asi que nos aseguraremos de que este logueado
@@ -40,7 +40,7 @@ module.exports = function(app, passport){
 
 		res.render('profile.ejs', {
 			user : req.user //cogemos el usuario y lo pasamos al template
-		})
+		});
 	});
 
 	//LOGOUT
