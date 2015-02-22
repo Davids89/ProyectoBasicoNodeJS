@@ -21,7 +21,7 @@ var session = require('express-session'); //middleware para las sesiones
 var database = require('./config/database.js'); //en este archivo guardamos la config de la BBDD
 mongoose.connect(database.url); //cogemos el atributo de url para hacer la conexion
 
-//require('./config/passport') //cogemos el passport para la configuracion
+require('./config/passport')(passport) //cogemos el passport para la configuracion
 
 //==========CONFIGURACION DE EXPRESS=============
 
