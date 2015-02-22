@@ -4,7 +4,7 @@ var localStrategy = require('passport-local').Strategy;
 
 //cargamos el modelo de usuario
 
-var User = require('../app/models/user.js');
+var User = require('../app/models/user');
 
 //vamos a crear un modulo passport
 
@@ -16,6 +16,12 @@ module.exports = function(passport){
 	//este es para introducir en la sesión
 	passport.serializeUser(function(user, done){
 		done(null, user.id);
+	});
+
+	passport.deserializeUser(function(id, done){
+		User.findById(id, function(err, user){
+			done(err, user);
+		});
 	});
 
 	//######LOCAL SIGNUP######
@@ -59,4 +65,11 @@ module.exports = function(passport){
 		 }
 
 	));
+
+	//######LOCAL LOGIN######
+
+	passport.use('local-login', new localStrategy({
+		//por defecto, como en el signup, se usa nombre de usuario y contraseña
+		//nosotros vamos a usar email y contraseña
+	}))
 };
