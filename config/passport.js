@@ -71,5 +71,29 @@ module.exports = function(passport){
 	passport.use('local-login', new localStrategy({
 		//por defecto, como en el signup, se usa nombre de usuario y contraseña
 		//nosotros vamos a usar email y contraseña
-	}))
+		usernameField : 'email',
+		passwordField : 'password',
+		passReqToCallback : true //nos va a permitir devolver la request entera a la callback
+	},
+
+		function(req, email, password, done){
+			//esta es la callback que trae el email y la password del formulario
+			//buscamos un usuario que tenga el mismo email
+			//estamos comprobando si alguien que se quiere loguear esta registrado antes
+
+			User.findOne({'local.email' : email}, function(err, user){
+				if(err)
+					return done(err);
+				//si no encontramos un usuario registrado devolvemos un mensaje flash
+				if(!user)
+					return done(null, false, req.flash('loginMessage', 'Usuario no valido'));
+				//si el usuario es valido pero no la contraseña
+				if(!user.validPassword(password))
+					return done(null, false, req.flash('loginMessage', 'Ops! Contraseña no valida'));
+				else
+					done(null, user);
+			});
+		}
+
+	));
 };
