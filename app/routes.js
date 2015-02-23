@@ -47,10 +47,38 @@ module.exports = function(app, passport){
 		});
 	});
 
+	//AUTH DE FACEBOOK
+	//ruta para la autentificación de facebook y login
+
+	app.get('/auth/facebook', passport.authenticate('facebook', { scope : 'email' })); //el scope es información que por defecto facebook no nos da
+
+	//manejamos la callback una vez que facebook lo ha autenticado
+
+	app.get('/auth/facebook/callback',
+        passport.authenticate('facebook', {
+            successRedirect : '/profile',
+            failureRedirect : '/'
+        }));
+
+	//hay que tener cuidado porque al configurar la app en facebook hay que poner como URL: http://localhost:8080/
+
+
+	//AUTH DE TWITTER
+	//ruta para la autenticación de twitter y login
+
+	app.get('/auth/twitter', passport.authenticate('twitter'));
+
+	//manejamos la callback una vez que twitter lo ha autenticado
+	app.get('/auth/twitter/callback', 
+		passport.authenticate('twitter', {
+			successRedirect : '/profile',
+			failureRedirect : '/'
+		}));
+
 	//LOGOUT
 
 	app.get('/logout', function(req, res){
-		res.logout();
+		req.logout();
 		res.redirect('/');
 	});
 
