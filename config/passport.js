@@ -1,10 +1,16 @@
 //importamos lo que necesitamos
 
-var localStrategy = require('passport-local').Strategy;
+var localStrategy = require('passport-local').Strategy; //login local
+var FacebookStrategy = require('passport-facebook').Strategy; //login por facebook
+var TwitterStrategy = require('passport-twitter'); //login con twitter
 
 //cargamos el modelo de usuario
 
 var User = require('../app/models/user');
+
+//cargamos la configuración de auth
+
+var configAuth = require('./auth');
 
 //vamos a crear un modulo passport
 
@@ -36,6 +42,17 @@ module.exports = function(passport){
 			/*Al hacerlo de forma asíncrona, el User.findOne no se disparará hasta que los datos estén de vuelta*/
 			/*Se ha hecho de forma asincrona, por tanto debemos devolver una callback, ya que si usamos un 
 			argumento de vuelta no nos servira. Hay que confirmarle a passport que todo ha ido bien*/
+
+			/*la función process.nextTick se basa en el event loop de Node. Es un ciclo de ejecución y las callback
+			se ejecutan una tras otra. Lo que vamos a hacer, es retrasar la ejecución de esta parte de código
+			al siguiente Tick del ciclo de Node, para que pueda seguir ejecutando otra funciones si son necesarias*/
+
+			/*Esto tambien se puede hacer con setTimeout(function(),0). La función process.nextTick no es sólo un alias de
+			setTimeout sino que también es mucho más eficiente
+
+			https://gist.github.com/mmalecki/1257394		
+
+			*/
 			process.nextTick(function(){
 				//tengo que encontrar un usuario al que le coincida el email
 				//debemos saber si el usuario que intenta hacer loggin esta ya registrado
@@ -96,4 +113,99 @@ module.exports = function(passport){
 		}
 
 	));
+
+	//######FACEBOOK LOGIN######
+
+	passport.use(new FacebookStrategy({
+		//debemos coger los datos almacenados en auth.js
+		clientID : configAuth.facebookAuth.clientID,
+		clientSecret : configAuth.facebookAuth.clientSecret,
+		callbackURL : configAuth.facebookAuth.callbackURL
+	},
+		/*profile es el usuario como tal que es pasado a cada servicio (facebook, twitter o g+)
+		Passport estandariza la información que viene a través de profile
+		todo lo que viene con profile esta en este enlace
+
+		http://passportjs.org/guide/profile/
+
+		*/
+		function(token, refreshToken, profile, done){
+			//de nuevo lo vamos a hacer de forma asíncrona
+			process.nextTick(function(){
+				//buscamos el usuario en la base de datos basándonos en su facebook ID
+				User.findOne({'facebook.id' : profile.id}, function(err, user){
+					//si hay error lo paramos todos y volvemos
+					if (err)
+						return done(err);
+					//si encontramos el usuario logueamos
+					if (user)
+						return done(null, user); //usuario encontrado y lo devolvemos
+					else{
+						//si no encontramos usuario con ese facebook id lo vamos a crear
+						var newUser = new User();
+						//le asignamos su información de Facebook
+						newUser.facebook.id = profile.id;
+						newUser.facebook.token = token;
+						//mirando en la docu de passport vemos que el nombre se compone de dos
+						//el nombre es givenName y los apellidos familyName
+						newUser.facebook.name = profile.name.givenName + ' ' + profile.name.familyName;
+						newUser.facebook.email = profile.emails[0].value; //por lo visto facebook puede 
+						//retornar varios email así que cogemos el primero que será el principal
+
+						//ahora ya que tenemos todo asignado vamos a guardar el usuario
+						newUser.save(function(err){
+							if(err)
+								throw err;
+							else
+								return done(null, newUser);
+						});
+					}
+				});
+			});
+		}
+
+	));
+
+	//######TWITTER LOGIN######
+
+	passport.use(new TwitterStrategy({
+		consumerKey : configAuth.twitterAuth.consumerKey,
+		consumerSecret : configAuth.twitterAuth.consumerSecret,
+		callbackURL : configAuth.twitterAuth.callbackURL
+	},
+
+		function(token, tokenSecret, profile, done){
+			//como siempre hacemos el codigo asíncrono
+			process.nextTick(function(){
+				User.findOne({'twitter.id' : profile.id}, function(err, user){
+					//si hay error paramos y volvemos
+					if (err)
+						return done(err);
+					//si encontramos el usuario logueamos
+					if (user)
+						return done(null, user); //usuario encontrado, lo retornamos
+					else{
+						//si no hay usuario lo creamos
+						var newUser = new User();
+						//asignamos los datos necesarios
+						newUser.twitter.id = profile.id;
+						newUser.twitter.token = token;
+						newUser.twitter.username = profile.username;
+						newUser.twitter.displayName = profile.displayName;
+
+						//guardamos el usuario
+
+						newUser.save(function(err){
+							if (err)
+								throw err;
+							else
+								return done(null, newUser);
+						});
+					}
+				});
+			});
+		}
+
+	));
+
 };
