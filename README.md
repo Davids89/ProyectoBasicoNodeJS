@@ -4,7 +4,7 @@ Proyecto básico de NodeJS para hacer login tanto local, como en redes sociales 
 
 - app
 	- models
-		-user.js //modelo de nuestros usuarios
+		- user.js //modelo de nuestros usuarios
 	routes.js // todas las rutas de la app
 - config
 	- auth.js // alojará todas las keys de los usuarios (Facebook, Twitter y G+)
