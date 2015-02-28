@@ -15,6 +15,8 @@ var morgan = require('morgan'); //middleware para HTTP request
 var cookieParser = require('cookie-parser'); //para parsear cookies
 var bodyParser = require('body-parser'); //middleware para parsear bodies
 var session = require('express-session'); //middleware para las sesiones
+var favicon = require('serve-favicon'); //para poner el favicon a la web
+app.use(express.static(process.cwd() + '/public'));
 
 //==========CONEXION CON LA BASE DE DATOS=============
 
@@ -27,13 +29,25 @@ require('./config/passport')(passport); //cogemos el passport para la configurac
 
 app.use(morgan('dev')); //para ver cada request en la consola
 app.use(cookieParser()); //leemos las cookies (necesario para auth)
-app.use(bodyParser()); //para coger informacion de los formularios
+
+app.use(bodyParser.urlencoded({
+  extended: true
+})); //para coger informacion de los formularios
+app.use(bodyParser.json());
 
 app.set('view engine', 'ejs'); //elegimos como motor de template jade
 
+app.use(favicon(__dirname + '/public/images/favicon.ico'));
+
 //==========PASSPORT=============
 
-app.use(session({ secret : 'ilovescotchscotchyscotchscotch' })); //este es el hash
+app.use(session({
+    secret: 'ilovescotchscotchyscotchscotch',
+    name: 'games4visual',
+    proxy: true,
+    resave: true,
+    saveUninitialized: true
+}));
 app.use(passport.initialize());
 app.use(passport.session()); //para que las sesiones sean persistentes
 app.use(flash()); //usamos connect-flash para mensajes flash almacenados en session

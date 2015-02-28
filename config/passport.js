@@ -33,7 +33,7 @@ module.exports = function(passport){
 	//######LOCAL SIGNUP######
 
 	passport.use('local-signup', new localStrategy({
-		usernameField : 'email',
+		usernameField : 'email', //aqui cogemos los datos del formulario
 		passwordField : 'password',
 		passReqToCallback : true //nos va a permitir devolver la request entera a la callback
 	},

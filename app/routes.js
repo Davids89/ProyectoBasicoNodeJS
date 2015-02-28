@@ -17,7 +17,7 @@ module.exports = function(app, passport){
 
 	//procesamos el formulario de login
 	app.post('/login', passport.authenticate('local-login', {
-		successRedirect : '/profile',
+		successRedirect : '/main',
 		failureRedirect : '/login',
 		failureFlash : true
 	}));
@@ -31,7 +31,7 @@ module.exports = function(app, passport){
 
 	//procesamos el formulario de registro
 	app.post('/signup', passport.authenticate('local-signup',{
-		successRedirect : '/profile',
+		successRedirect : '/main',
 		failureRedirect : '/signup',
 		failureFlash : true
 	}));
@@ -40,9 +40,9 @@ module.exports = function(app, passport){
 	//queremos proteger esta pagina asi que nos aseguraremos de que este logueado
 	//usaremos un middleware isLoggedIn
 
-	app.get('/profile', isLoggedIn, function(req, res){
+	app.get('/main', isLoggedIn, function(req, res){
 
-		res.render('profile.ejs', {
+		res.render('main.ejs', {
 			user : req.user //cogemos el usuario y lo pasamos al template
 		});
 	});
@@ -56,7 +56,7 @@ module.exports = function(app, passport){
 
 	app.get('/auth/facebook/callback',
         passport.authenticate('facebook', {
-            successRedirect : '/profile',
+            successRedirect : '/main',
             failureRedirect : '/'
         }));
 
@@ -71,7 +71,7 @@ module.exports = function(app, passport){
 	//manejamos la callback una vez que twitter lo ha autenticado
 	app.get('/auth/twitter/callback', 
 		passport.authenticate('twitter', {
-			successRedirect : '/profile',
+			successRedirect : '/main',
 			failureRedirect : '/'
 		}));
 
