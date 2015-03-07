@@ -1,5 +1,9 @@
 Proyecto básico de NodeJS para hacer login tanto local, como en redes sociales (Facebook, Twitter y G+)
 
+Antes de descargar ejecutar:
+
+npm install
+
 ####Estructura básica####
 
 - app
